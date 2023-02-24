@@ -1,0 +1,51 @@
+service: resizer-api
+frameworkVersion: '3'
+
+plugins:
+  - serverless-plugin-tracing
+  - serverless-mocha-plugin
+
+provider:
+  name: aws
+  runtime: nodejs18.x
+  tracing:
+    apiGateway: true
+    lambda: true
+  iamRoleStatements:
+    - Effect: Allow
+      Action:
+        - s3:GetObject
+        - s3:PutObject
+      Resource: arn:aws:s3:::resizer-api-bucket/*
+    - Effect: Allow
+      Action:
+        - "sqs:*"
+      Resource: arn:aws:sqs:us-east-1:637154232334:resizer-api-queue
+
+functions:
+  uploadImage:
+    handler: src/uploadImage.handler
+    events:
+      - http:
+          path: /image
+          method: post
+          request:
+            contentHandling: CONVERT_TO_BINARY
+    tracing: true
+  resizeImage:
+    handler: src/resizeImage.handler
+    events:
+      - sqs:
+          arn: arn:aws:sqs:us-east-1:637154232334:resizer-api-queue
+    tracing: true
+
+resources:
+  Resources:
+    MyBucket:
+      Type: AWS::S3::Bucket
+      Properties:
+        BucketName: resizer-api-bucket
+    MyQueue:
+      Type: AWS::SQS::Queue
+      Properties:
+        QueueName: resizer-api-queue

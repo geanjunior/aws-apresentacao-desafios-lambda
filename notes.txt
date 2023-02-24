@@ -1,0 +1,18 @@
+npm install -g serverless
+
+serverless create --template aws-nodejs --path resizer-api
+
+npm install --platform=linux --arch=x64 sharp
+
+serverless invoke test
+
+serverless deploy
+
+
+
+--------
+serverless plugin install -n serverless-plugin-tracing
+
+npm install serverless-mocha-plugin --save-dev
+
+curl -X POST -H "Content-Type: image/jpeg" --data-binary "@C:\Users\naegr\OneDrive\Imagens\backgrounds\background-1000x500.jpg" https://8qntuzm895.execute-api.us-east-1.amazonaws.com/dev/image?filename=background01.jpg
